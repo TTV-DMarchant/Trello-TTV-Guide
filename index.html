@@ -287,6 +287,7 @@
       </div>
     </div>
     <div class="tip-box">Click the description field inside the card and paste in the relevant SoW or proposal text. This keeps everything tied to the deal in one place, so anyone on the team can see the full context.</div>
+    <div class="tip-box" style="border-color:#f59e0b">&#9888; Important: once you have pasted your text, click the <strong>Save</strong> button that appears below the description box. If you just click away without saving, your text will be lost.</div>
   </div>
 
   <!-- STEP 5 -->
@@ -319,6 +320,7 @@
       <div style="font-size:11px;color:#475569;text-align:center;margin-top:6px">Drag your card to the section that best matches where the deal stands today</div>
     </div>
     <div class="tip-box">To drag a card: click and hold it, then move it up or down within the Upcoming column. Release it in the right group. The "Very Likely" section is highlighted in orange, so it's easy to spot.</div>
+    <div class="tip-box">After closing the card, it won't jump to its new position automatically. You will need to scroll through the Upcoming column to find it in the section you placed it in.</div>
   </div>
 
   <!-- STEP 6 -->
@@ -350,7 +352,24 @@
     </div>
     <div class="tip-box">Click and hold the card, drag it horizontally to the right across to the "Sold/Actionable" column, and drop it there. This signals to the team that the deal is closed and ready for fulfilment.</div>
     <div class="success-box">
-      Done! The deal is now live in the project management board. Check in with David if you're ever unsure which stage a deal belongs in, or if a deal needs to be split across multiple products.
+      Done! The deal is now live in the pipeline. Check in with David or Sean if you're ever unsure which stage a deal belongs in, or if a deal needs to be split across multiple products.
+    </div>
+  </div>
+
+  <!-- WARNINGS PANEL: always visible below steps -->
+  <div id="warnings-panel" style="margin-top:32px;border-top:0.5px solid #2d3748;padding-top:24px;display:none">
+    <div style="font-size:13px;font-weight:600;color:#f1f5f9;margin-bottom:14px;display:flex;align-items:center;gap:8px">
+      <span style="color:#f59e0b">&#9888;</span> Watch out: common mistakes for new Trello users
+    </div>
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div class="tip-box" style="border-color:#f59e0b">
+        <strong style="color:#fbbf24;display:block;margin-bottom:4px">Accidentally archiving a card</strong>
+        If you hover over a card and press <code style="background:#0f172a;padding:2px 6px;border-radius:4px;font-size:12px">C</code> on your keyboard, Trello will instantly archive it. This is easy to do without realising. If a card disappears, go to the board menu, click "Archived items," find the card, and click "Send to board" to restore it.
+      </div>
+      <div class="tip-box" style="border-color:#f59e0b">
+        <strong style="color:#fbbf24;display:block;margin-bottom:4px">Copy and paste formatting issues</strong>
+        When pasting proposal text into a card description, pasting directly from Word or email can bring in unwanted formatting. If it looks messy, try using <code style="background:#0f172a;padding:2px 6px;border-radius:4px;font-size:12px">Ctrl+Shift+V</code> (Windows) or <code style="background:#0f172a;padding:2px 6px;border-radius:4px;font-size:12px">Cmd+Shift+V</code> (Mac) to paste as plain text instead.
+      </div>
     </div>
   </div>
 
@@ -392,6 +411,7 @@
     document.getElementById('panel-' + current).classList.remove('visible');
     current = step;
     document.getElementById('panel-' + current).classList.add('visible');
+    document.getElementById('warnings-panel').style.display = step >= 3 ? 'block' : 'none';
     renderNav();
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
