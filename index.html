@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Trello Training Guide: Adding a New Deal</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: #111827;
+    color: #e2e8f0;
+    min-height: 100vh;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 40px 16px;
+  }
+  .outer {
+    width: 100%;
+    max-width: 680px;
+  }
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 28px;
+  }
+  .brand-logo {
+    width: 32px; height: 32px; border-radius: 6px;
+    background: #0052cc;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; color: #fff; font-weight: 700;
+  }
+  .brand-name { font-size: 14px; color: #8592a3; letter-spacing: .04em; }
+  .guide-title { font-size: 22px; font-weight: 600; color: #f1f5f9; margin-bottom: 4px; }
+  .guide-sub { font-size: 14px; color: #8592a3; margin-bottom: 28px; }
+
+  .step-nav { display: flex; gap: 6px; margin-bottom: 16px; flex-wrap: wrap; }
+  .step-dot {
+    width: 30px; height: 30px; border-radius: 50%;
+    border: 1.5px solid #334155;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 500; cursor: pointer;
+    color: #8592a3; transition: all .2s;
+  }
+  .step-dot.active { background: #3b82f6; border-color: #3b82f6; color: #fff; }
+  .step-dot.done { background: #22c55e; border-color: #22c55e; color: #fff; }
+  .step-dot:hover:not(.active):not(.done) { border-color: #3b82f6; color: #3b82f6; }
+
+  .progress-bar { height: 3px; background: #1e293b; border-radius: 2px; margin-bottom: 6px; }
+  .progress-fill { height: 100%; background: #3b82f6; border-radius: 2px; transition: width .3s; }
+  .step-count { font-size: 12px; color: #64748b; text-align: right; margin-bottom: 20px; }
+
+  .step-panel { display: none; }
+  .step-panel.visible { display: block; }
+
+  .step-header { display: flex; align-items: flex-start; gap: 14px; margin-bottom: 20px; }
+  .step-num {
+    width: 36px; height: 36px; border-radius: 50%;
+    background: #3b82f6; color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 15px; font-weight: 600; flex-shrink: 0; margin-top: 2px;
+  }
+  .step-title { font-size: 18px; font-weight: 600; color: #f1f5f9; }
+  .step-subtitle { font-size: 13px; color: #8592a3; margin-top: 3px; }
+
+  .trello-mock {
+    background: #1d2125;
+    border-radius: 10px;
+    padding: 16px;
+    margin: 16px 0;
+    border: 1px solid #2d3748;
+  }
+  .t-col { background: #282e33; border-radius: 8px; padding: 10px; }
+  .t-col-title { font-size: 11px; font-weight: 600; color: #b6c2cf; margin-bottom: 8px; letter-spacing: .06em; text-transform: uppercase; }
+  .t-card {
+    background: #22272b; border-radius: 6px; padding: 8px 10px;
+    margin-bottom: 6px; font-size: 12px; color: #b6c2cf;
+    border: 1px solid rgba(166,197,226,0.08);
+  }
+  .t-card.highlight { border-color: #3b82f6; box-shadow: 0 0 0 2px rgba(59,130,246,0.25); }
+  .t-card.template-card { background: #0c3d7a; color: #bfdbfe; border-color: rgba(59,130,246,0.3); }
+  .t-badge {
+    display: inline-flex; align-items: center; gap: 4px;
+    font-size: 11px; background: #1e3a5f; color: #93c5fd;
+    padding: 2px 7px; border-radius: 4px; margin-top: 5px;
+  }
+
+  .tip-box {
+    background: #1e293b;
+    border-left: 3px solid #3b82f6;
+    border-radius: 0 6px 6px 0;
+    padding: 10px 14px;
+    font-size: 13px; color: #94a3b8;
+    margin: 14px 0;
+    line-height: 1.6;
+  }
+
+  .naming-example { background: #1e293b; border-radius: 8px; padding: 16px; margin: 14px 0; }
+  .naming-label { font-size: 13px; font-weight: 600; color: #f1f5f9; margin-bottom: 12px; }
+  .naming-row { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-top: 8px; }
+  .name-part { padding: 4px 11px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+  .np-client { background: #1e3a5f; color: #93c5fd; }
+  .np-project { background: #14532d; color: #86efac; }
+  .np-value { background: #431407; color: #fdba74; }
+  .np-owner { background: #2e1065; color: #d8b4fe; }
+  .divider { height: 0.5px; background: #2d3748; margin: 14px 0; }
+  .eg-label { font-size: 12px; color: #64748b; margin-bottom: 8px; }
+  .eg-full { font-size: 13px; font-weight: 600; color: #f1f5f9; margin-bottom: 10px; font-family: 'Courier New', monospace; background: #0f172a; padding: 8px 12px; border-radius: 6px; }
+
+  .pipe-cols { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 14px 0; }
+  .pipe-col { background: #282e33; border-radius: 8px; padding: 10px; }
+  .pipe-col-title { font-size: 10px; font-weight: 600; color: #8592a3; margin-bottom: 8px; letter-spacing: .05em; text-transform: uppercase; }
+  .pipe-card-sm {
+    background: #22272b; border-radius: 5px; padding: 7px 8px;
+    font-size: 11px; color: #b6c2cf; margin-bottom: 5px;
+    border: 1px solid rgba(166,197,226,0.08);
+    line-height: 1.4;
+  }
+  .pipe-card-sm.unlikely { border-left: 3px solid #64748b; }
+  .pipe-card-sm.possible { border-left: 3px solid #3b82f6; }
+  .pipe-card-sm.vl { border-left: 3px solid #f59e0b; background: #1c1505; }
+  .pipe-hint { font-size: 10px; color: #475569; margin-top: 5px; line-height: 1.4; }
+
+  .sold-grid { display: grid; grid-template-columns: 1fr auto 1fr; gap: 10px; align-items: center; margin: 14px 0; }
+  .sold-arrow { text-align: center; font-size: 22px; color: #22c55e; }
+  .sold-card {
+    background: #22272b; border-radius: 6px; padding: 10px 11px;
+    font-size: 12px; color: #b6c2cf;
+    border: 1px solid #22c55e;
+    box-shadow: 0 0 0 1px rgba(34,197,94,0.2);
+  }
+  .sold-tag { font-size: 10px; color: #22c55e; margin-top: 4px; }
+  .t-col-green { background: #282e33; border-radius: 8px; padding: 10px; border: 1px solid rgba(34,197,94,0.2); }
+  .t-col-title-green { font-size: 11px; font-weight: 600; color: #22c55e; margin-bottom: 8px; letter-spacing: .06em; text-transform: uppercase; }
+
+  .success-box { background: #052e16; border-radius: 8px; padding: 14px 16px; margin-top: 14px; font-size: 13px; color: #86efac; line-height: 1.6; }
+
+  .mock-card-detail { background: #22272b; border-radius: 8px; padding: 16px; max-width: 320px; margin: 0 auto; border: 1px solid #2d3748; }
+  .mock-card-title { font-size: 12px; font-weight: 600; color: #b6c2cf; margin-bottom: 12px; }
+  .mock-divider { height: 0.5px; background: #2d3748; margin: 10px 0; }
+  .mock-field-label { font-size: 11px; color: #64748b; display: flex; align-items: center; gap: 5px; margin-bottom: 6px; }
+  .mock-desc-box { background: #1d2125; border-radius: 5px; padding: 10px; font-size: 11px; color: #579dff; min-height: 70px; border: 1px solid #2d3748; }
+  .mock-hint { font-size: 10px; color: #475569; margin-top: 8px; text-align: center; }
+
+  .create-btn { background: #1e3a5f; color: #93c5fd; border-radius: 6px; padding: 9px 14px; font-size: 12px; text-align: center; border: 1px solid rgba(59,130,246,0.3); margin-top: 10px; }
+  .create-hint { font-size: 10px; color: #475569; text-align: center; margin-top: 6px; }
+
+  .btn-row { display: flex; gap: 10px; margin-top: 24px; }
+  .btn-nav {
+    padding: 9px 22px; border-radius: 7px;
+    font-size: 13px; font-weight: 500; cursor: pointer;
+    border: 1px solid #334155; background: transparent;
+    color: #e2e8f0; transition: all .15s;
+  }
+  .btn-nav:hover { background: #1e293b; border-color: #4b6072; }
+  .btn-nav.primary { background: #3b82f6; border-color: #3b82f6; color: #fff; }
+  .btn-nav.primary:hover { background: #2563eb; border-color: #2563eb; }
+
+  @media (max-width: 500px) {
+    .pipe-cols { grid-template-columns: 1fr; }
+    .sold-grid { grid-template-columns: 1fr; }
+    .sold-arrow { transform: rotate(90deg); }
+  }
+</style>
+</head>
+<body>
+<div class="outer">
+  <div class="brand">
+    <div class="brand-logo">T</div>
+    <div class="brand-name">TelecomTV Sales Board</div>
+  </div>
+  <div class="guide-title">Adding a New Deal to Trello</div>
+  <div class="guide-sub">Step-by-step guide for new users</div>
+
+  <div class="step-nav" id="step-nav"></div>
+  <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+  <div class="step-count" id="step-count"></div>
+
+  <!-- STEP 1 -->
+  <div class="step-panel" id="panel-1">
+    <div class="step-header">
+      <div class="step-num">1</div>
+      <div>
+        <div class="step-title">Open the template card</div>
+        <div class="step-subtitle">In the "Upcoming" column, find the blue card at the top</div>
+      </div>
+    </div>
+    <div class="trello-mock">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div class="t-col">
+          <div class="t-col-title">Upcoming...</div>
+          <div class="t-card template-card highlight">
+            <div style="font-weight:600;font-size:12px">MASTER BOOKING DEETS TEMPLATE</div>
+            <div class="t-badge">&#9632; This card is a template</div>
+          </div>
+          <div class="t-card" style="opacity:.35">DELIVERABLES</div>
+          <div class="t-card" style="opacity:.25;border-left:3px solid #f59e0b">VERY LIKELY AWAITING...</div>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;padding:8px">
+          <div style="font-size:12px;color:#64748b;text-align:center;line-height:1.5">Click the blue card at the top of the Upcoming column</div>
+          <div style="font-size:22px;color:#3b82f6">&#8592;</div>
+        </div>
+      </div>
+    </div>
+    <div class="tip-box">It is pinned at the top of the Upcoming column. You can't miss it: it's the one with the blue "This card is a template" badge.</div>
+  </div>
+
+  <!-- STEP 2 -->
+  <div class="step-panel" id="panel-2">
+    <div class="step-header">
+      <div class="step-num">2</div>
+      <div>
+        <div class="step-title">Create a card from the template</div>
+        <div class="step-subtitle">Inside the template card, click the button to create a new card</div>
+      </div>
+    </div>
+    <div class="trello-mock">
+      <div class="mock-card-detail">
+        <div class="mock-card-title">MASTER BOOKING DEETS TEMPLATE</div>
+        <div class="create-btn">+ Create card from template</div>
+        <div class="create-hint">A new card will be created with all sections pre-filled</div>
+      </div>
+    </div>
+    <div class="tip-box">When you click "Create card from template," Trello instantly generates a new card with all the correct sections already set up. You just need to fill them in.</div>
+  </div>
+
+  <!-- STEP 3 -->
+  <div class="step-panel" id="panel-3">
+    <div class="step-header">
+      <div class="step-num">3</div>
+      <div>
+        <div class="step-title">Name the card correctly</div>
+        <div class="step-subtitle">Follow the naming structure exactly, every time</div>
+      </div>
+    </div>
+    <div class="naming-example">
+      <div class="naming-label">Naming structure:</div>
+      <div class="naming-row">
+        <div class="name-part np-client">(Client Name)</div>
+        <span style="color:#64748b;font-size:13px">Project Name</span>
+        <span style="color:#64748b;font-size:13px">-</span>
+        <div class="name-part np-value">$Value</div>
+        <span style="color:#64748b;font-size:13px">-</span>
+        <div class="name-part np-owner">Initials</div>
+      </div>
+      <div class="divider"></div>
+      <div class="eg-label">Example:</div>
+      <div class="eg-full">(Ericsson) DSP Leaders Sponsorship - $25,000 - ZC</div>
+      <div class="naming-row" style="margin-top:10px">
+        <div class="name-part np-client">(Ericsson)</div>
+        <span style="font-size:12px;color:#64748b">Client name, always in brackets</span>
+      </div>
+      <div class="naming-row">
+        <div class="name-part np-project">DSP Leaders Sponsorship</div>
+        <span style="font-size:12px;color:#64748b">The product or deal type</span>
+      </div>
+      <div class="naming-row">
+        <div class="name-part np-value">$25,000</div>
+        <span style="font-size:12px;color:#64748b">Deal value in USD</span>
+      </div>
+      <div class="naming-row">
+        <div class="name-part np-owner">ZC</div>
+        <span style="font-size:12px;color:#64748b">Your initials (the deal owner)</span>
+      </div>
+    </div>
+    <div class="tip-box">Consistent naming keeps the pipeline readable for the whole team. If you're unsure of the exact product name, check existing cards in the board for reference.</div>
+  </div>
+
+  <!-- STEP 4 -->
+  <div class="step-panel" id="panel-4">
+    <div class="step-header">
+      <div class="step-num">4</div>
+      <div>
+        <div class="step-title">Add the SoW or proposal text</div>
+        <div class="step-subtitle">Paste the scope of work or proposal into the card description</div>
+      </div>
+    </div>
+    <div class="trello-mock">
+      <div class="mock-card-detail">
+        <div class="mock-card-title">(Ericsson) DSP Leaders Sponsorship - $25k - ZC</div>
+        <div class="mock-divider"></div>
+        <div class="mock-field-label">&#9776; Description</div>
+        <div class="mock-desc-box">Paste your SoW or proposal text here...</div>
+        <div class="mock-hint">Click the description area to start typing or pasting</div>
+      </div>
+    </div>
+    <div class="tip-box">Click the description field inside the card and paste in the relevant SoW or proposal text. This keeps everything tied to the deal in one place, so anyone on the team can see the full context.</div>
+  </div>
+
+  <!-- STEP 5 -->
+  <div class="step-panel" id="panel-5">
+    <div class="step-header">
+      <div class="step-num">5</div>
+      <div>
+        <div class="step-title">Place the card in the right pipeline stage</div>
+        <div class="step-subtitle">Drag the card to the correct position within the Upcoming column</div>
+      </div>
+    </div>
+    <div class="trello-mock">
+      <div class="pipe-cols">
+        <div class="pipe-col">
+          <div class="pipe-col-title" style="color:#64748b">Possible but unlikely</div>
+          <div class="pipe-card-sm unlikely">Early conversation, no budget confirmed</div>
+          <div class="pipe-hint">Low confidence; early-stage interest only</div>
+        </div>
+        <div class="pipe-col">
+          <div class="pipe-col-title" style="color:#3b82f6">Possible</div>
+          <div class="pipe-card-sm possible">Proposal sent, good engagement</div>
+          <div class="pipe-hint">Actively progressing; real interest shown</div>
+        </div>
+        <div class="pipe-col">
+          <div class="pipe-col-title" style="color:#f59e0b">Very likely awaiting paperwork</div>
+          <div class="pipe-card-sm vl">Verbal yes, contract being reviewed</div>
+          <div class="pipe-hint">Verbal commitment; waiting on docs</div>
+        </div>
+      </div>
+      <div style="font-size:11px;color:#475569;text-align:center;margin-top:6px">Drag your card to the section that best matches where the deal stands today</div>
+    </div>
+    <div class="tip-box">To drag a card: click and hold it, then move it up or down within the Upcoming column. Release it in the right group. The "Very Likely" section is highlighted in orange, so it's easy to spot.</div>
+  </div>
+
+  <!-- STEP 6 -->
+  <div class="step-panel" id="panel-6">
+    <div class="step-header">
+      <div class="step-num">6</div>
+      <div>
+        <div class="step-title">Move sold deals to Sold/Actionable</div>
+        <div class="step-subtitle">When a deal is won, drag the card across to the right column</div>
+      </div>
+    </div>
+    <div class="trello-mock">
+      <div class="sold-grid">
+        <div class="t-col">
+          <div class="t-col-title">Upcoming...</div>
+          <div class="t-card" style="border-left:3px solid #f59e0b;background:#1c1505">
+            (Ericsson) DSP Leaders - $25k - ZC
+          </div>
+        </div>
+        <div class="sold-arrow">&#10142;</div>
+        <div class="t-col-green">
+          <div class="t-col-title-green">Sold/Actionable</div>
+          <div class="sold-card">
+            (Ericsson) DSP Leaders - $25k - ZC
+            <div class="sold-tag">&#10003; Deal won</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="tip-box">Click and hold the card, drag it horizontally to the right across to the "Sold/Actionable" column, and drop it there. This signals to the team that the deal is closed and ready for fulfilment.</div>
+    <div class="success-box">
+      Done! The deal is now live in the pipeline. Check in with David or Sean if you're ever unsure which stage a deal belongs in, or if a deal needs to be split across multiple products.
+    </div>
+  </div>
+
+  <div class="btn-row" id="btn-row">
+    <button class="btn-nav" id="btn-back" onclick="navigate(-1)">&#8592; Back</button>
+    <button class="btn-nav primary" id="btn-next" onclick="navigate(1)">Next step &#8594;</button>
+  </div>
+</div>
+
+<script>
+  var current = 1;
+  var total = 6;
+
+  function renderNav() {
+    var nav = document.getElementById('step-nav');
+    nav.innerHTML = '';
+    for (var i = 1; i <= total; i++) {
+      var d = document.createElement('div');
+      d.className = 'step-dot' + (i === current ? ' active' : i < current ? ' done' : '');
+      d.textContent = i;
+      (function(s){ d.onclick = function(){ goTo(s); }; })(i);
+      nav.appendChild(d);
+    }
+    var pct = ((current / total) * 100).toFixed(0);
+    document.getElementById('progress-fill').style.width = pct + '%';
+    document.getElementById('step-count').textContent = 'Step ' + current + ' of ' + total;
+    document.getElementById('btn-back').style.display = current > 1 ? 'inline-block' : 'none';
+    var nextBtn = document.getElementById('btn-next');
+    if (current === total) {
+      nextBtn.textContent = 'Start over';
+      nextBtn.onclick = function(){ goTo(1); };
+    } else {
+      nextBtn.textContent = 'Next step \u2192';
+      nextBtn.onclick = function(){ navigate(1); };
+    }
+  }
+
+  function goTo(step) {
+    document.getElementById('panel-' + current).classList.remove('visible');
+    current = step;
+    document.getElementById('panel-' + current).classList.add('visible');
+    renderNav();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function navigate(dir) {
+    goTo(Math.max(1, Math.min(total, current + dir)));
+  }
+
+  goTo(1);
+</script>
+</body>
+</html>
